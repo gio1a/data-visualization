@@ -6,7 +6,7 @@
 </template>
 
 <script>
-
+    import { mapState } from 'vuex'
     export default {
         name:'Rank',
         data(){
@@ -16,6 +16,18 @@
                 start: 0,
                 end: 9, // 区域缩放终点
                 timer: null
+            }
+        },
+        computed: {
+            ...mapState(['theme'])
+        },
+        watch: {
+            theme() {
+                console.log('主题切换了...')
+                this.chartInstance.dispose() // 销毁当前图表
+                this.initChart() // 重新初始化图表
+                this.screenAdapter() 
+                this.updateChart()
             }
         },
         mounted(){
@@ -35,7 +47,7 @@
         methods: {
             // 初始化echartInstance对象
             async initChart(){
-                this.chartInstance = this.$echarts.init(this.$refs.rank_ref, 'chalk')
+                this.chartInstance = this.$echarts.init(this.$refs.rank_ref, this.theme)
                 const initOption = {
                     xAxis: {
                         type: 'category'

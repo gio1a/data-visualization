@@ -8,6 +8,7 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex'
     export default {
         name:'Seller',
         data(){
@@ -17,6 +18,18 @@
                 currentPage: 1, // 当前页数
                 totalPage: 0, // 总页数
                 timer: null
+            }
+        },
+        computed: {
+            ...mapState(['theme'])
+        },
+        watch: {
+            theme() {
+                console.log('主题切换了...')
+                this.chartInstance.dispose() // 销毁当前图表
+                this.initChart() // 重新初始化图表
+                this.screenAdapter() 
+                this.updateChart()
             }
         },
         mounted(){
@@ -36,7 +49,7 @@
         methods: {
             // 初始化echartInstance对象
             initChart(){
-                this.chartInstance = this.$echarts.init(this.$refs.seller_ref, 'chalk')
+                this.chartInstance = this.$echarts.init(this.$refs.seller_ref, this.theme)
                 // 对图表初始化配置的控制
                 const initOption = {
                     title: {

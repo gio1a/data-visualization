@@ -57,7 +57,7 @@ export default class SocketService {
         this.ws.onmessage = msg => {
             console.log("从服务端获取到了数据...")
             // console.log('服务端发来的msg --------> ',msg)
-            // console.log('服务端发来的msg中的data --------> ',msg.data)
+            console.log('服务端发来的msg中的data --------> ',msg.data)
             const recvData = JSON.parse(msg.data)
             const socketType = recvData.socketType
 

@@ -6,6 +6,7 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex'
     export default {
         name:'Stock',
         data(){
@@ -14,6 +15,18 @@
                 allData: null,
                 currentIndex: 0,
                 timer: null
+            }
+        },
+        computed: {
+            ...mapState(['theme'])
+        },
+        watch: {
+            theme() {
+                console.log('主题切换了...')
+                this.chartInstance.dispose() // 销毁当前图表
+                this.initChart() // 重新初始化图表
+                this.screenAdapter() 
+                this.updateChart()
             }
         },
         mounted(){
@@ -33,7 +46,7 @@
         methods: {
             // 初始化echartInstance对象
             initChart(){
-                this.chartInstance = this.$echarts.init(this.$refs.stock_ref, 'chalk')
+                this.chartInstance = this.$echarts.init(this.$refs.stock_ref, this.theme)
                 
                 const initOption = {
                     title: {
@@ -80,11 +93,10 @@
                 const seriesArr = showData.map((item, index) => {
                     return {
                         type: 'pie',
-                        radius: [110, 100],
                         center: centerArr[index],
                         data: [
                             {
-                                name: item.name + '\n' + item.sales,
+                                name: item.name + '\n\n' + item.sales,
                                 value: item.sales,
                                 itemStyle: {
                                     color: new this.$echarts.graphic.LinearGradient(0,1,0,0,[
@@ -135,7 +147,7 @@
             // 浏览器窗口大小适配
             screenAdapter(){
                 const titleFontSize = this.$refs.stock_ref.offsetWidth / 100 * 3.6
-                const innerRadius = titleFontSize * 2
+                const innerRadius = titleFontSize * 2.8
                 const outterRadius = innerRadius * 1.125
                 const adapterOption = {
                     title: {

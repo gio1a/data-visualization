@@ -7,6 +7,7 @@
 
 <script>
     import axios from 'axios'
+    import { mapState } from 'vuex'
     import { getProvinceMapInfo } from '../utils/map_utils'
 
     export default {
@@ -16,6 +17,18 @@
                 chartInstance: null,
                 allData: null,
                 mapData: {} // 省份地图矢量数据幻缓存
+            }
+        },
+        computed: {
+            ...mapState(['theme'])
+        },
+        watch: {
+            theme() {
+                console.log('主题切换了...')
+                this.chartInstance.dispose() // 销毁当前图表
+                this.initChart() // 重新初始化图表
+                this.screenAdapter() 
+                this.updateChart()
             }
         },
         mounted(){
@@ -37,7 +50,7 @@
         methods: {
             // 初始化echartInstance对象
             async initChart(){
-                this.chartInstance = this.$echarts.init(this.$refs.map_ref, 'chalk')
+                this.chartInstance = this.$echarts.init(this.$refs.map_ref, this.theme)
 
                 // 获取中国地图的矢量数据(localhost:8999/static/map/china.json)
                 const ret = await axios.get('http://localhost:8999/static/map/china.json')

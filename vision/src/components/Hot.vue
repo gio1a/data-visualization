@@ -9,6 +9,9 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex'
+    import { getThemeValue } from '@/utils/theme_utils'
+
     export default {
         name:'Hot',
         data(){
@@ -35,7 +38,18 @@
             window.addEventListener('resize', this.screenAdapter)
             this.screenAdapter()
         },
+        watch: {
+            theme() {
+                console.log('主题切换了...')
+                this.chartInstance.dispose() // 销毁当前图表
+                this.initChart() // 重新初始化图表
+                this.screenAdapter() 
+                this.updateChart()
+            }
+        },
         computed: {
+            ...mapState(['theme']),
+
             subTitle() {
                 if(!this.allData) {
                     return ''
@@ -45,14 +59,15 @@
             },
             comStyle() {
                 return {
-                    fontSize: this.titleFontSize + 'px'
+                    fontSize: this.titleFontSize + 'px',
+                    color: getThemeValue(this.theme).titleColor
                 }
             }
         },
         methods: {
             // 初始化echartInstance对象
             initChart(){
-                this.chartInstance = this.$echarts.init(this.$refs.hot_ref, 'chalk')
+                this.chartInstance = this.$echarts.init(this.$refs.hot_ref, this.theme)
 
                 const initOption = {
                     series: [{
@@ -140,8 +155,8 @@
                         center: ['50%','60%']
                     }],
                     legend: {
-                        itemWidth: this.titleFontSize / 2,
-                        itemHeight: this.titleFontSize / 2,
+                        itemWidth: this.titleFontSize,
+                        itemHeight: this.titleFontSize,
                         itemGap: this.titleFontSize / 2,
                         textStyle: {
                             fontSize: this.titleFontSize / 2
