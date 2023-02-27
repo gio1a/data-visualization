@@ -10,7 +10,7 @@
 
 <script>
     export default {
-        name:'',
+        name:'Hot',
         data(){
             return {
                 chartInstance: null,
@@ -21,8 +21,17 @@
             }
         },
         mounted(){
+            // 在组件创建完成之后，进行回调函数的注册
+            this.$socket.registerCallBack('hotData', this.getData)
             this.initChart()
-            this.getData()
+            
+            // 发送请求给服务器
+            this.$socket.send({
+                action: 'getData',
+                socketType: 'hotData',
+                chartName: 'hotproduct',
+                value: ''
+            })
             window.addEventListener('resize', this.screenAdapter)
             this.screenAdapter()
         },
@@ -91,8 +100,8 @@
                 this.chartInstance.setOption(initOption)
             },
             // 获取数据
-            async getData(){
-                const {data: ret} = await this.$http.get('hotproduct')
+            async getData(ret){
+                // const {data: ret} = await this.$http.get('hotproduct')
                 this.allData = ret
                 this.updateChart()
             },
@@ -160,6 +169,7 @@
         },
         beforeDestroy() {
             window.removeEventListener('resize', this.screenAdapter)
+            this.$socket.unRegisterCallBack('hotData')
         }
     }
 </script>

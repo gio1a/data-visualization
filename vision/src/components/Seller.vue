@@ -9,7 +9,7 @@
 
 <script>
     export default {
-        name:'',
+        name:'Seller',
         data(){
             return {
                 chartInstance: null,
@@ -20,8 +20,16 @@
             }
         },
         mounted(){
+            this.$socket.registerCallBack('sellerData', this.getData)
             this.initChart()
-            this.getData()
+
+            // 发送请求给服务器
+            this.$socket.send({
+                action: 'getData',
+                socketType: 'sellerData',
+                chartName: 'seller',
+                value: ''
+            })
             window.addEventListener('resize', this.screenAdapter)
             this.screenAdapter()
         },
@@ -96,8 +104,8 @@
                 })
             },
             // 获取数据
-            async getData(){
-                const {data: ret} = await this.$http.get('seller')
+            async getData(ret){
+                // const {data: ret} = await this.$http.get('seller')
                 this.sellerData = ret.sort((a, b) => a.value - b.value)
                 // console.log('sorted seller data ---> ',this.sellerData)
 
@@ -171,6 +179,7 @@
         beforeDestroy() {
             clearInterval(this.timer)
             window.removeEventListener('resize', this.screenAdapter)
+            this.$socket.unRegisterCallBack('sellerData')
         }
     }
 </script>

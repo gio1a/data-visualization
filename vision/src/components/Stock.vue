@@ -7,7 +7,7 @@
 
 <script>
     export default {
-        name:'',
+        name:'Stock',
         data(){
             return {
                 chartInstance: null,
@@ -17,8 +17,16 @@
             }
         },
         mounted(){
+            this.$socket.registerCallBack('stockData', this.getData)
             this.initChart()
-            this.getData()
+
+            // 发送请求给服务器
+            this.$socket.send({
+                action: 'getData',
+                socketType: 'stockData',
+                chartName: 'stock',
+                value: ''
+            })
             window.addEventListener('resize', this.screenAdapter)
             this.screenAdapter()
         },
@@ -44,8 +52,8 @@
                 })
             },
             // 获取数据
-            async getData(){
-                const {data: ret} = await this.$http.get('stock')
+            async getData(ret){
+                // const {data: ret} = await this.$http.get('stock')
                 this.allData = ret
                 this.updateChart()
                 this.pageTurner() // 启动自动翻页
@@ -180,6 +188,7 @@
         beforeDestroy() {
             clearInterval(this.timer)
             window.removeEventListener('resize', this.screenAdapter)
+            this.$socket.unRegisterCallBack('stockData')
         }
     }
 </script>

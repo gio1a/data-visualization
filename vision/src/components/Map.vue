@@ -19,8 +19,17 @@
             }
         },
         mounted(){
+            // 在组件创建完成之后，进行回调函数的注册
+            this.$socket.registerCallBack('mapData', this.getData)
             this.initChart()
-            this.getData()
+
+            // 发送请求给服务器
+            this.$socket.send({
+                action: 'getData',
+                socketType: 'mapData',
+                chartName: 'map',
+                value: ''
+            })
             window.addEventListener('resize', this.screenAdapter)
             this.screenAdapter()
         },
@@ -77,8 +86,8 @@
             },
 
             // 获取服务器的数据
-            async getData(){
-                const {data: ret} = await this.$http.get('map')
+            async getData(ret){
+                // const {data: ret} = await this.$http.get('map')
                 this.allData = ret
                 this.updateChart()
             },
@@ -143,6 +152,7 @@
 
         beforeDestroy() {
             window.removeEventListener('resize', this.screenAdapter)
+            this.$socket.unRegisterCallBack('mapData')
         }
     }
 </script>

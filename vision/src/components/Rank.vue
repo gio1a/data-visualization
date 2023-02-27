@@ -19,8 +19,16 @@
             }
         },
         mounted(){
+            this.$socket.registerCallBack('rankData', this.getData)
             this.initChart()
-            this.getData()
+
+            // 发送请求给服务器
+            this.$socket.send({
+                action: 'getData',
+                socketType: 'rankData',
+                chartName: 'rank',
+                value: ''
+            })
             window.addEventListener('resize', this.screenAdapter)
             this.screenAdapter()
         },
@@ -71,8 +79,8 @@
             },
 
             // 获取服务器的数据
-            async getData(){
-                const {data: ret} = await this.$http.get('rank')
+            async getData(ret){
+                // const {data: ret} = await this.$http.get('rank')
                 this.allData = ret.sort((a, b)=> b.value - a.value)
                 this.updateChart()
                 this.itemWalker()
@@ -168,6 +176,7 @@
         beforeDestroy() {
             clearInterval(this.timer)
             window.removeEventListener('resize', this.screenAdapter)
+            this.$socket.unRegisterCallBack('rankData')
         }
     }
 </script>
